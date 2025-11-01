@@ -5,6 +5,10 @@ from werkzeug.utils import secure_filename
 import os
 import hashlib
 import json
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Import services
 from auth_service import VoterAuthService
@@ -14,6 +18,7 @@ from vote_service import VoteProcessor
 from excel_manager import ExcelManager
 from anti_replay import AntiReplayProtection
 from security_config import SecurityConfig
+from otp_service import OTPService
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})  # Enable CORS for frontend
@@ -26,6 +31,7 @@ tamper_chain = TamperEvidenceChain('vote_chain.json')
 vote_processor = VoteProcessor(auth_service, kyc_service, tamper_chain)
 excel_manager = ExcelManager('voter_registry.xlsx', 'vote_records.xlsx', 'candidates.xlsx')
 anti_replay = AntiReplayProtection()
+otp_service = OTPService()
 
 # Load voter registry and candidates at startup
 excel_manager.load_voter_registry()
@@ -80,26 +86,154 @@ def get_candidates():
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
-    """Voter authentication endpoint"""
-    data = request.json
-    
-    success, token, voter_info = auth_service.validate_voter(
-        data['voter_id'],
-        data['dob'],
-        data['email']
-    )
-    
-    if success:
-        return jsonify({
-            'success': True,
-            'session_token': token,
-            'voter_info': voter_info
-        }), 200
-    else:
+    """Voter authentication endpoint - Step 1: Validate credentials and send OTP"""
+    try:
+        data = request.json
+        
+        success, temp_token, voter_info = auth_service.validate_voter(
+            data['voter_id'],
+            data['dob'],
+            data['email']
+        )
+        
+        if success:
+            # Check rate limiting
+            can_request, error_msg = otp_service.can_request_otp(data['email'])
+            if not can_request:
+                return jsonify({
+                    'success': False,
+                    'error': error_msg
+                }), 429
+            
+            # Generate and send OTP
+            otp = otp_service.generate_otp()
+            otp_service.store_otp(data['email'], otp)
+            
+            # Send OTP via email
+            email_sent, test_otp = otp_service.send_otp_email(
+                data['email'], 
+                voter_info['name'], 
+                otp
+            )
+            
+            response_data = {
+                'success': True,
+                'requires_otp': True,
+                'temp_token': temp_token,
+                'message': f'OTP sent to {data["email"][:3]}***@{data["email"].split("@")[1]}'
+            }
+            
+            # Include OTP in response for testing if email not configured
+            if test_otp:
+                response_data['test_otp'] = test_otp
+                response_data['message'] += ' (Check console for OTP)'
+            
+            return jsonify(response_data), 200
+        else:
+            return jsonify({
+                'success': False,
+                'error': voter_info.get('error', 'Authentication failed') if voter_info else 'Invalid credentials'
+            }), 401
+    except Exception as e:
+        print(f"Error in login: {e}")
         return jsonify({
             'success': False,
-            'error': voter_info.get('error', 'Authentication failed')
-        }), 401
+            'error': 'Server error'
+        }), 500
+
+@app.route('/api/auth/verify-otp', methods=['POST'])
+def verify_otp():
+    """Verify OTP and complete login - Step 2"""
+    try:
+        data = request.json
+        email = data.get('email')
+        otp = data.get('otp')
+        temp_token = data.get('temp_token')
+        
+        # Verify OTP
+        otp_valid, message = otp_service.verify_otp(email, otp)
+        
+        if otp_valid:
+            # Complete login and create session
+            success, session_token, voter_info = auth_service.complete_login_after_otp(temp_token)
+            
+            if success:
+                return jsonify({
+                    'success': True,
+                    'session_token': session_token,
+                    'voter_info': voter_info,
+                    'message': 'Login successful'
+                }), 200
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': voter_info.get('error', 'Session creation failed')
+                }), 401
+        else:
+            return jsonify({
+                'success': False,
+                'error': message
+            }), 401
+            
+    except Exception as e:
+        print(f"Error in verify_otp: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Verification failed'
+        }), 500
+
+@app.route('/api/auth/resend-otp', methods=['POST'])
+def resend_otp():
+    """Resend OTP"""
+    try:
+        data = request.json
+        email = data.get('email')
+        temp_token = data.get('temp_token')
+        
+        # Verify temp_token is still valid
+        if temp_token not in auth_service.pending_otp_verifications:
+            return jsonify({
+                'success': False,
+                'error': 'Session expired. Please login again.'
+            }), 401
+        
+        # Check rate limiting
+        can_request, error_msg = otp_service.can_request_otp(email)
+        if not can_request:
+            return jsonify({
+                'success': False,
+                'error': error_msg
+            }), 429
+        
+        # Get voter info
+        voter_info = auth_service.pending_otp_verifications[temp_token]['voter_info']
+        
+        # Generate and send new OTP
+        otp = otp_service.generate_otp()
+        otp_service.store_otp(email, otp)
+        
+        email_sent, test_otp = otp_service.send_otp_email(
+            email, 
+            voter_info['name'], 
+            otp
+        )
+        
+        response_data = {
+            'success': True,
+            'message': 'New OTP sent successfully'
+        }
+        
+        if test_otp:
+            response_data['test_otp'] = test_otp
+        
+        return jsonify(response_data), 200
+        
+    except Exception as e:
+        print(f"Error in resend_otp: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to resend OTP'
+        }), 500
 
 @app.route('/api/kyc/upload', methods=['POST'])
 def upload_kyc():
