@@ -1,8 +1,10 @@
 # app.py (Flask example)
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
+import hashlib
+import json
 
 # Import services
 from auth_service import VoterAuthService
@@ -27,6 +29,23 @@ anti_replay = AntiReplayProtection()
 
 # Load voter registry at startup
 excel_manager.load_voter_registry()
+
+# ========== HTML ROUTES ==========
+
+@app.route('/')
+def index():
+    """Serve the login page"""
+    return send_file('login.html')
+
+@app.route('/vote')
+def vote_page():
+    """Serve the voting page"""
+    return send_file('voting.html')
+
+@app.route('/login')
+def login_page():
+    """Serve the login page"""
+    return send_file('login.html')
 
 # ========== API ENDPOINTS ==========
 
