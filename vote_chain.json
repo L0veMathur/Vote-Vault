@@ -101,5 +101,37 @@
     },
     "previous_hash": "295e29a7907457570d4cefe53c0002c21ba52ff98f4942ab3716d22f6af90431",
     "hash": "29263e99a27034ac78c2e08644571c31b07e3f57ee2df0067f3420a2185e0dbd"
+  },
+  {
+    "index": 7,
+    "timestamp": "2025-11-01T10:17:53.848464",
+    "data": {
+      "voter_id_hash": "3320671f2aa8397fb6814a28b47f9dba636f55fdd8c287d8d7d3b427091ac692",
+      "vote_hash": "ba244d86b42c4e4a70c78484a08eb27e800e6909af89e97a2a8bb1e7b081c2b5",
+      "kyc_image_hash": "048af77058deed684d353218529d4b75716d3180dfc761767764000f1315c95b",
+      "timestamp": "2025-11-01T10:17:53.848411",
+      "geolocation": {
+        "city": "Unknown",
+        "country": "Unknown"
+      }
+    },
+    "previous_hash": "29263e99a27034ac78c2e08644571c31b07e3f57ee2df0067f3420a2185e0dbd",
+    "hash": "053427f8f402cd599c5e4a2b0767c5a7fc4d2e61b3fbf155c0def749b5414cf4"
+  },
+  {
+    "index": 8,
+    "timestamp": "2025-11-01T10:20:26.435668",
+    "data": {
+      "voter_id_hash": "3320671f2aa8397fb6814a28b47f9dba636f55fdd8c287d8d7d3b427091ac692",
+      "vote_hash": "f356d4480a350f7c06a52aeeeb3a5820623c21a9ece8e8798cd3ba4d49a05534",
+      "kyc_image_hash": "3edf94cd8123e609090218e38718c4455a0d13ce2c7ff0484ce450bbdfe10465",
+      "timestamp": "2025-11-01T10:20:26.435594",
+      "geolocation": {
+        "city": "Unknown",
+        "country": "Unknown"
+      }
+    },
+    "previous_hash": "053427f8f402cd599c5e4a2b0767c5a7fc4d2e61b3fbf155c0def749b5414cf4",
+    "hash": "e6ff6be85d2bcbf1469002b9aeaf91cf46cf0357ce35a3c3e30e51de1014eb68"
   }
 ]

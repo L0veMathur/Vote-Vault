@@ -112,23 +112,32 @@ async function loadCandidates() {
             
             data.candidates.forEach((candidate, index) => {
                 const candidateDiv = document.createElement('div');
-                candidateDiv.className = 'candidate-option';
+                candidateDiv.className = 'bg-white dark:bg-gray-700/50 border-2 border-gray-200 dark:border-gray-600 rounded-lg p-4 cursor-pointer transition-all hover:border-primary hover:bg-blue-50 dark:hover:bg-gray-700';
                 candidateDiv.innerHTML = `
-                    <input type="radio" id="candidate${index}" name="candidate" 
-                           value="${candidate.CandidateName}" ${index === 0 ? 'required' : ''}>
-                    <label for="candidate${index}">
-                        <strong>${candidate.CandidateName}</strong><br>
-                        <small>${candidate.PoliticalParty} ${candidate.PartySymbol || ''}</small><br>
-                        <small style="font-style: italic;">"${candidate.Slogan || ''}"</small>
+                    <label class="flex items-start gap-4 cursor-pointer w-full">
+                        <input type="radio" id="candidate${index}" name="candidate" 
+                               value="${candidate.CandidateName}" ${index === 0 ? 'required' : ''}
+                               class="mt-1 w-5 h-5 text-primary focus:ring-primary focus:ring-2">
+                        <div class="flex-1">
+                            <div class="font-bold text-lg text-body-text-light dark:text-body-text-dark">${candidate.CandidateName}</div>
+                            <div class="text-sm text-secondary-text mt-1">${candidate.PoliticalParty} ${candidate.PartySymbol || ''}</div>
+                            <div class="text-sm italic text-gray-600 dark:text-gray-400 mt-1">"${candidate.Slogan || ''}"</div>
+                        </div>
                     </label>
                 `;
+                
+                // Add click event to select radio when clicking the entire div
+                candidateDiv.addEventListener('click', () => {
+                    document.getElementById(`candidate${index}`).checked = true;
+                });
+                
                 candidatesList.appendChild(candidateDiv);
             });
         }
     } catch (error) {
         console.error('Error loading candidates:', error);
         document.getElementById('candidatesList').innerHTML = 
-            '<p style="color: red;">Error loading candidates. Please refresh the page.</p>';
+            '<div class="text-center py-8"><p class="text-red-600 dark:text-red-400">Error loading candidates. Please refresh the page.</p></div>';
     }
 }
 
@@ -147,8 +156,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const webcamStarted = await kycCapture.initWebcam();
     
     if (!webcamStarted) {
-        document.getElementById('error-message').textContent = 'Unable to access camera. Please grant camera permissions.';
-        document.getElementById('error-message').classList.remove('hidden');
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.querySelector('p').textContent = 'Unable to access camera. Please grant camera permissions.';
+        errorDiv.classList.remove('hidden');
         return;
     }
     
@@ -179,11 +189,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Load candidates
             await loadCandidates();
             
+            // Update progress bar to Phase 3
+            const progressText = document.querySelector('.text-base.font-medium.leading-normal.text-body-text-light');
+            if (progressText) {
+                progressText.textContent = 'Protocol Phase 3 of 3: Vote Casting';
+            }
+            
+            const progressBar = document.querySelector('.rounded.bg-primary');
+            if (progressBar) {
+                progressBar.style.width = '100%';
+            }
+            
+            // Update tab styling
+            const kycTab = document.getElementById('kycTab');
+            const voteTab = document.getElementById('voteTab');
+            if (kycTab && voteTab) {
+                kycTab.classList.remove('border-primary', 'text-primary');
+                kycTab.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+                
+                voteTab.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+                voteTab.classList.add('border-primary', 'text-primary');
+                voteTab.setAttribute('aria-current', 'page');
+            }
+            
             // Hide KYC section, show voting section
             document.getElementById('kycSection').classList.add('hidden');
             document.getElementById('voteSection').classList.remove('hidden');
         } else {
-            errorDiv.textContent = 'Failed to upload photo: ' + uploadResult.error;
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.querySelector('p').textContent = 'Failed to upload photo: ' + uploadResult.error;
             errorDiv.classList.remove('hidden');
         }
     });
@@ -218,8 +252,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             if (response.ok && data.success) {
                 const messageDiv = document.getElementById('voteMessage');
-                messageDiv.className = 'success';
-                messageDiv.textContent = 'Vote submitted successfully! Your vote has been recorded securely.';
+                messageDiv.className = 'bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 font-medium';
+                messageDiv.textContent = '✅ Vote submitted successfully! Your vote has been recorded securely.';
                 messageDiv.classList.remove('hidden');
                 
                 // Disable form
@@ -233,12 +267,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }, 3000);
             } else {
                 const errorDiv = document.getElementById('error-message');
-                errorDiv.textContent = 'Failed to submit vote: ' + (data.error || 'Unknown error');
+                errorDiv.querySelector('p').textContent = 'Failed to submit vote: ' + (data.error || 'Unknown error');
                 errorDiv.classList.remove('hidden');
             }
         } catch (error) {
             const errorDiv = document.getElementById('error-message');
-            errorDiv.textContent = 'Network error: ' + error.message;
+            errorDiv.querySelector('p').textContent = 'Network error: ' + error.message;
             errorDiv.classList.remove('hidden');
         }
     });

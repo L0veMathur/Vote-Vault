@@ -1,58 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Voting Portal - Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Voter Registration Portal - Login</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#86198f",
+                        "background-light": "#f8f5fa",
+                        "background-dark": "#110e13",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
 </head>
-<body>
-    <div class="container">
-        <div class="login-box">
-            <h1>Secure Voting Portal</h1>
-            
-            <!-- Step 1: Credentials Form -->
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="voterId">Voter ID</label>
-                    <input type="text" id="voterId" required 
-                           pattern="[A-Za-z0-9]{3,12}" 
-                           placeholder="Enter your Voter ID">
-                </div>
-                <div class="form-group">
-                    <label for="dob">Date of Birth</label>
-                    <input type="date" id="dob" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" required>
-                </div>
-                <button type="submit" class="btn-primary">Request OTP</button>
-            </form>
-            
-            <!-- Step 2: OTP Verification (hidden initially) -->
-            <div id="otpSection" class="hidden" style="margin-top: 20px;">
-                <div class="info-box">
-                    <p id="otpMessage">✉️ OTP has been sent to your email</p>
-                </div>
-                
-                <form id="otpForm">
-                    <div class="form-group">
-                        <label for="otpInput">Enter 6-Digit OTP</label>
-                        <input type="text" id="otpInput" required 
-                               pattern="[0-9]{6}" 
-                               maxlength="6"
-                               placeholder="000000"
-                               style="text-align: center; font-size: 24px; letter-spacing: 8px;">
+<body class="font-display">
+    <div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
+            <main class="flex flex-1 justify-center items-center py-5">
+                <div class="layout-content-container flex flex-col max-w-7xl flex-1 items-center justify-center">
+                    <div class="@container w-full">
+                        <div class="grid grid-cols-1 @[1024px]:grid-cols-2 gap-0 w-full max-w-5xl mx-auto rounded-xl shadow-lg overflow-hidden bg-white/5 dark:bg-[#201a24]/40">
+                            <div class="flex flex-col items-center justify-center gap-6 px-8 py-12 @[768px]:px-12">
+                                <div class="flex flex-col gap-4 text-center w-full max-w-md">
+                                    <h1 class="text-slate-900 dark:text-white text-3xl font-black leading-tight tracking-[-0.033em] @[480px]:text-4xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">Voter Portal Login</h1>
+                                    <h2 class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal @[480px]:text-lg @[480px]:font-normal @[480px]:leading-normal">Access your official voter information.</h2>
+                                </div>
+                                
+                                <!-- Step 1: Credentials Form -->
+                                <form id="loginForm" class="flex flex-col gap-6 w-full max-w-md">
+                                    <label class="flex flex-col w-full">
+                                        <p class="text-slate-800 dark:text-white text-base font-medium leading-normal pb-2">Voter ID Number</p>
+                                        <input id="voterId" type="text" required pattern="[A-Za-z0-9]{3,12}" placeholder="Enter your Voter ID" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-300 dark:border-[#4d3a5a] bg-slate-50 dark:bg-[#201a24] focus:border-primary dark:focus:border-primary h-14 placeholder:text-slate-400 dark:placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal"/>
+                                    </label>
+                                    <label class="flex flex-col w-full">
+                                        <p class="text-slate-800 dark:text-white text-base font-medium leading-normal pb-2">Date of Birth</p>
+                                        <input id="dob" type="date" required class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-300 dark:border-[#4d3a5a] bg-slate-50 dark:bg-[#201a24] focus:border-primary dark:focus:border-primary h-14 placeholder:text-slate-400 dark:placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal"/>
+                                    </label>
+                                    <label class="flex flex-col w-full">
+                                        <p class="text-slate-800 dark:text-white text-base font-medium leading-normal pb-2">Email Address</p>
+                                        <input id="email" type="email" required placeholder="Enter your email address" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-300 dark:border-[#4d3a5a] bg-slate-50 dark:bg-[#201a24] focus:border-primary dark:focus:border-primary h-14 placeholder:text-slate-400 dark:placeholder:text-slate-500 p-[15px] text-base font-normal leading-normal"/>
+                                    </label>
+                                    <button type="submit" class="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-5 bg-gradient-to-r from-magenta-500 to-violet-600 hover:from-magenta-600 hover:to-violet-700 dark:from-fuchsia-600 dark:to-violet-700 dark:hover:from-fuchsia-700 dark:hover:to-violet-800 text-white text-base font-bold leading-normal tracking-[0.015em] transition-colors duration-200">
+                                        <span class="truncate">Request OTP</span>
+                                    </button>
+                                </form>
+                                
+                                <!-- Step 2: OTP Verification (hidden initially) -->
+                                <div id="otpSection" class="hidden flex flex-col gap-6 w-full max-w-md">
+                                    <div class="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                                        <p id="otpMessage" class="text-blue-700 dark:text-blue-300 text-sm font-medium text-center">✉️ OTP has been sent to your email</p>
+                                    </div>
+                                    
+                                    <form id="otpForm" class="flex flex-col gap-6 w-full">
+                                        <label class="flex flex-col w-full">
+                                            <p class="text-slate-800 dark:text-white text-base font-medium leading-normal pb-2">Enter 6-Digit OTP</p>
+                                            <input id="otpInput" type="text" required pattern="[0-9]{6}" maxlength="6" placeholder="000000" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-300 dark:border-[#4d3a5a] bg-slate-50 dark:bg-[#201a24] focus:border-primary dark:focus:border-primary h-14 placeholder:text-slate-400 dark:placeholder:text-slate-500 p-[15px] text-2xl font-bold leading-normal text-center tracking-[0.5em]"/>
+                                        </label>
+                                        <button type="submit" class="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-5 bg-gradient-to-r from-magenta-500 to-violet-600 hover:from-magenta-600 hover:to-violet-700 dark:from-fuchsia-600 dark:to-violet-700 dark:hover:from-fuchsia-700 dark:hover:to-violet-800 text-white text-base font-bold leading-normal tracking-[0.015em] transition-colors duration-200">
+                                            <span class="truncate">Verify OTP</span>
+                                        </button>
+                                        <button type="button" id="resendOtpBtn" class="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-5 bg-gradient-to-r from-magenta-500 to-violet-600 hover:from-magenta-600 hover:to-violet-700 dark:from-fuchsia-600 dark:to-violet-700 dark:hover:from-fuchsia-700 dark:hover:to-violet-800 text-white text-base font-bold leading-normal tracking-[0.015em] transition-colors duration-200">
+                                            <span class="truncate">Resend OTP (<span id="resendTimer">60</span>s)</span>
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <div id="error-message" class="hidden bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-4 w-full max-w-md">
+                                    <p class="text-red-700 dark:text-red-300 text-sm font-medium text-center"></p>
+                                </div>
+                                
+                                <div class="flex flex-col gap-4 items-center text-center text-sm w-full max-w-md">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-green-500" style="font-size: 16px;">lock</span>
+                                        <p class="text-slate-500 dark:text-slate-400">Secure Connection</p>
+                                    </div>
+                                    <div class="flex flex-wrap justify-center items-center gap-x-4 gap-y-2">
+                                        <a href="#" class="text-primary hover:underline">Help & Support</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-center bg-gradient-to-br from-magenta-100 to-violet-200 dark:from-fuchsia-950 dark:to-violet-950 p-8 min-h-[400px]">
+                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQu3hCYWOq9_jsKYWixlSrYITi-_D87FOArfvCizfg9EGR4vs4-85BZ75aGdKoXJVQHL47ylhSw86riY4g5ttFSc5EE8rjjmB-lecj_mChEWPk8XGNfyjwi-Cyq7Dn9YnhwiwMgZwVfo9ubYLpQt6KLpc5PMAzwvKZv5mb3Wke7la6achIZRSIiA7sNZOb6z9p2Rq9bp33ZF02ur4_hE5Gags6IcdupxmwOxDjE5PcA_R32cpCCmvBOfmm5FcCkrdjK3Fg9mpdmnwS" alt="Voting illustration" class="max-w-full max-h-[600px] object-contain rounded-xl shadow-lg" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'text-center text-fuchsia-600\'><svg class=\'w-48 h-48 mx-auto\' fill=\'currentColor\' viewBox=\'0 0 24 24\'><path d=\'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 14H7v-2h6v2zm3-4H7v-2h9v2zm0-4H7V7h9v2z\'/></svg><p class=\'mt-4 text-lg font-semibold\'>Secure Voting Portal</p></div>';" />
+                            </div>
+                        </div>
                     </div>
-                    <button type="submit" class="btn-primary">Verify OTP</button>
-                    <button type="button" id="resendOtpBtn" class="btn-primary" style="margin-top: 10px;">
-                        Resend OTP (<span id="resendTimer">60</span>s)
-                    </button>
-                </form>
-            </div>
-            
-            <div id="error-message" class="error hidden"></div>
+                </div>
+            </main>
+            <footer class="w-full py-4">
+                <div class="flex justify-center items-center gap-6 text-sm text-slate-500 dark:text-slate-400">
+                    <a href="#" class="hover:text-primary hover:underline">Privacy Policy</a>
+                    <a href="#" class="hover:text-primary hover:underline">Terms of Service</a>
+                </div>
+            </footer>
         </div>
     </div>
     <script src="auth.js"></script>
