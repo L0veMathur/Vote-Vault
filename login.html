@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Voting Portal - Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <h1>Secure Voting Portal</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="voterId">Voter ID</label>
+                    <input type="text" id="voterId" required 
+                           pattern="[A-Z0-9]{8,12}" 
+                           placeholder="Enter your Voter ID">
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+                <div id="error-message" class="error hidden"></div>
+            </form>
+        </div>
+    </div>
+    <script src="auth.js"></script>
+</body>
+</html>
